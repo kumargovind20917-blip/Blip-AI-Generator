@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free AI Image Generator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: #0f172a; color: #fff; text-align: center; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    h1 { margin-bottom: 20px; color: #38bdf8; }
+    input[type="text"] { width: 100%; padding: 12px; border-radius: 6px; border: none; margin-bottom: 15px; font-size: 16px; color: #000; }
+    button { background: #38bdf8; color: #0f172a; font-weight: bold; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; }
+    button:hover { background: #0284c7; color: #fff; }
+    .ad-box { background: #334155; height: 90px; margin: 20px 0; border: 1px dashed #94a3b8; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
+    #result-box { margin-top: 20px; display: none; }
+    #generated-img { width: 100%; border-radius: 8px; margin-bottom: 15px; }
+    .download-btn { background: #22c55e; color: #fff; text-decoration: none; display: inline-block; padding: 10px 20px; border-radius: 6px; font-weight: bold; }
+    .download-btn:hover { background: #16a34a; }
+    #loader { display: none; color: #f59e0b; font-weight: bold; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>AI Image Generator</h1>
+    
+    <div class="ad-box">Ad Space (Google AdSense / Adsterra)</div>
+
+    <input type="text" id="prompt-input" placeholder="यहाँ प्रॉम्प्ट लिखें (उदा: Flying car in futuristic city)...">
+    <button onclick="generateImage()">Generate Image</button>
+
+    <div id="loader">इमेज बन रही है, कृपया प्रतीक्षा करें...</div>
+
+    <div id="result-box">
+      <img id="generated-img" src="" alt="AI Image">
+      <br>
+      <a id="download-link" class="download-btn" href="#" download="ai-image.jpg">Download Image</a>
+    </div>
+
+    <div class="ad-box">Ad Space (Loading Ad Zone)</div>
+  </div>
+
+  <script>
+    async function generateImage() {
+      const prompt = document.getElementById('prompt-input').value.trim();
+      if (!prompt) {
+        alert("कृपया कोई प्रॉम्प्ट लिखें!");
+        return;
+      }
+
+      const loader = document.getElementById('loader');
+      const resultBox = document.getElementById('result-box');
+      const imgElement = document.getElementById('generated-img');
+      const downloadLink = document.getElementById('download-link');
+
+      loader.style.display = 'block';
+      resultBox.style.display = 'none';
+
+      const encodedPrompt = encodeURIComponent(prompt);
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true`;
+
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+
+        imgElement.src = objectUrl;
+        downloadLink.href = objectUrl;
+
+        loader.style.display = 'none';
+        resultBox.style.display = 'block';
+      } catch (error) {
+        loader.style.display = 'none';
+        alert("इमेज जनरेट करने में समस्या आई, फिर से प्रयास करें।");
+      }
+    }
+  </script>
+
+</body>
+</html>
