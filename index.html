@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator - Create Free Visuals</title>
+    <title>Blip AI Generator - Free AI Image Generator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -39,14 +39,15 @@
         }
 
         header h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             color: #38bdf8;
             margin-bottom: 6px;
+            font-weight: 700;
         }
 
         header p {
             color: #94a3b8;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .input-group {
@@ -199,7 +200,7 @@
 
     <div class="container">
         <header>
-            <h1><i class="fa-solid fa-wand-magic-sparkles"></i> AI Image Generator</h1>
+            <h1><i class="fa-solid fa-wand-magic-sparkles"></i> Blip AI Generator</h1>
             <p>Turn your imagination into stunning AI-generated visuals for free!</p>
         </header>
 
@@ -240,7 +241,7 @@
             <img id="resultImage" alt="AI Generated Image">
         </div>
 
-        <a href="#" id="downloadBtn" class="download-btn" download="ai-image.jpg" target="_blank"><i class="fa-solid fa-download"></i> Download Image</a>
+        <a href="#" id="downloadBtn" class="download-btn" download="blip-ai-image.jpg" target="_blank"><i class="fa-solid fa-download"></i> Download Image</a>
     </div>
 
     <script>
@@ -288,7 +289,6 @@
             const cleanPrompt = encodeURIComponent(fullPrompt);
             const seed = Math.floor(Math.random() * 1000000);
 
-            // Primary URL & Fallback URLs
             const primaryUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
             const fallbackUrl = `https://pollinations.ai/p/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
 
@@ -307,7 +307,6 @@
             };
 
             tempImg.onerror = function() {
-                // Try fallback URL if primary fails
                 let fallbackImg = new Image();
                 fallbackImg.src = fallbackUrl;
 
@@ -316,7 +315,7 @@
                 };
 
                 fallbackImg.onerror = function() {
-                    alert('Image generate karne me dikkat aai. Kripya fir se Generate button dabayein!');
+                    alert('Image generate karne me दिक्कत आई। कृपया दोबारा प्रयास करें!');
                     resetUI();
                 };
             };
@@ -343,3 +342,7 @@
     </script>
 </body>
 </html>
+
+
+
+                
