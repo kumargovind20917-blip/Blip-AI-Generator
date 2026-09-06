@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blip AI Generator - Free AI Image Generator</title>
+    <title>Blip AI Generator - Free Image & Video Generator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -50,20 +50,50 @@
             font-size: 0.95rem;
         }
 
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            padding: 8px 18px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #94a3b8;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .mode-btn.active {
+            background: #0284c7;
+            color: white;
+            border-color: #0284c7;
+        }
+
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            width: 100%;
         }
 
         textarea {
             width: 100%;
-            height: 90px;
+            height: 100px;
             background: #0f172a;
             border: 1px solid #334155;
             border-radius: 10px;
-            padding: 12px;
+            padding: 12px 45px 12px 12px;
             color: #fff;
             font-size: 0.95rem;
             resize: none;
@@ -72,6 +102,40 @@
 
         textarea:focus {
             border-color: #38bdf8;
+        }
+
+        .mic-btn {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: #334155;
+            color: #38bdf8;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .mic-btn:hover {
+            background: #0284c7;
+            color: white;
+        }
+
+        .mic-btn.recording {
+            background: #ef4444;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .options-grid {
@@ -201,22 +265,34 @@
     <div class="container">
         <header>
             <h1><i class="fa-solid fa-wand-magic-sparkles"></i> Blip AI Generator</h1>
-            <p>Turn your imagination into stunning AI-generated visuals for free!</p>
+            <p>Generate free AI Images & Video Clips instantly!</p>
         </header>
 
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="imageModeBtn" onclick="setMode('image')"><i class="fa-regular fa-image"></i> AI Image</button>
+            <button class="mode-btn" id="videoModeBtn" onclick="setMode('video')"><i class="fa-solid fa-video"></i> AI Video/GIF</button>
+        </div>
+
         <div class="input-group">
-            <textarea id="promptInput" placeholder="Describe what you want to see... (e.g. A cute cat in superhero costume)"></textarea>
+            <div class="textarea-wrapper">
+                <textarea id="promptInput" placeholder="Describe what you want to see... Or tap the mic to speak!"></textarea>
+                <button class="mic-btn" id="micBtn" onclick="startVoiceRecognition()" title="Speak Prompt"><i class="fa-solid fa-microphone"></i></button>
+            </div>
             
-            <div class="options-grid">
+            <div class="options-grid" id="optionsGrid">
                 <div class="option-box">
                     <label>Art Style</label>
                     <select id="styleSelect">
                         <option value="">Default (Natural)</option>
-                        <option value="photorealistic, 8k resolution, highly detailed">Realistic Photo</option>
+                        <option value="photorealistic, 8k resolution, highly detailed">Photorealistic</option>
                         <option value="anime style, vibrant colors">Anime</option>
-                        <option value="3D render, Pixar style, smooth lighting">3D Render</option>
+                        <option value="3D render, Pixar style, smooth lighting">3D Pixar</option>
                         <option value="cyberpunk style, neon lights">Cyberpunk</option>
                         <option value="cinematic lighting, epic scene">Cinematic</option>
+                        <option value="pixel art style, 16-bit retro">Pixel Art</option>
+                        <option value="watercolor painting style, soft colors">Watercolor</option>
+                        <option value="pencil sketch, detailed black and white">Pencil Sketch</option>
+                        <option value="comic book style, marvel art">Comic Book</option>
                     </select>
                 </div>
                 <div class="option-box">
@@ -231,42 +307,109 @@
 
             <div class="actions">
                 <button class="btn btn-secondary" onclick="generateRandomPrompt()"><i class="fa-solid fa-shuffle"></i> Random</button>
-                <button class="btn btn-primary" id="generateBtn" onclick="generateImage()"><i class="fa-solid fa-bolt"></i> Generate Image</button>
+                <button class="btn btn-primary" id="generateBtn" onclick="handleGeneration()"><i class="fa-solid fa-bolt"></i> Generate</button>
             </div>
         </div>
 
         <div class="output-box" id="outputBox">
             <div class="loader" id="loader"></div>
-            <div class="placeholder-text" id="placeholder">Your generated image will appear here</div>
-            <img id="resultImage" alt="AI Generated Image">
+            <div class="placeholder-text" id="placeholder">Your creation will appear here</div>
+            <img id="resultImage" alt="AI Output">
         </div>
 
-        <a href="#" id="downloadBtn" class="download-btn" download="blip-ai-image.jpg" target="_blank"><i class="fa-solid fa-download"></i> Download Image</a>
+        <a href="#" id="downloadBtn" class="download-btn" download="blip-ai-creation.jpg" target="_blank"><i class="fa-solid fa-download"></i> Download</a>
     </div>
 
     <script>
+        let currentMode = 'image';
+
         const randomPrompts = [
-            "A cute baby panda wearing a space helmet, sitting on the moon, digital art",
+            "A cute baby panda wearing a space helmet, sitting on the moon",
             "A mystical forest with glowing mushrooms and a crystal clear river at night",
             "A futuristic flying car cruising through a neon-lit cyberpunk city",
             "An ancient underwater temple guarded by a giant glowing creature",
             "A majestic eagle made of fire flying over snow-covered mountains"
         ];
 
+        function setMode(mode) {
+            currentMode = mode;
+            const imgBtn = document.getElementById('imageModeBtn');
+            const vidBtn = document.getElementById('videoModeBtn');
+            const optionsGrid = document.getElementById('optionsGrid');
+            const generateBtn = document.getElementById('generateBtn');
+
+            if (mode === 'image') {
+                imgBtn.classList.add('active');
+                vidBtn.classList.remove('active');
+                optionsGrid.style.display = 'grid';
+                generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Image';
+            } else {
+                vidBtn.classList.add('active');
+                imgBtn.classList.remove('active');
+                optionsGrid.style.display = 'none';
+                generateBtn.innerHTML = '<i class="fa-solid fa-video"></i> Generate Video/GIF';
+            }
+        }
+
         function generateRandomPrompt() {
             const randomIndex = Math.floor(Math.random() * randomPrompts.length);
             document.getElementById('promptInput').value = randomPrompts[randomIndex];
         }
 
-        function generateImage() {
-            const promptText = document.getElementById('promptInput').value.trim();
-            const style = document.getElementById('styleSelect').value;
-            const ratio = document.getElementById('ratioSelect').value;
-
-            if (!promptText) {
-                alert('Kripya koi prompt likhein!');
+        // Voice Recognition (Mic Feature)
+        function startVoiceRecognition() {
+            const micBtn = document.getElementById('micBtn');
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Aapke browser me voice search support nahi hai. Kripya Chrome ka latest version use karein.');
                 return;
             }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+
+            recognition.lang = 'hi-IN'; // Supports Hindi and English voice input
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                micBtn.classList.add('recording');
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('promptInput').value = transcript;
+                micBtn.classList.remove('recording');
+            };
+
+            recognition.onerror = function() {
+                alert('Aawaaz sunne me dikkat aai. Kripya fir se bolen!');
+                micBtn.classList.remove('recording');
+            };
+
+            recognition.onend = function() {
+                micBtn.classList.remove('recording');
+            };
+
+            recognition.start();
+        }
+
+        function handleGeneration() {
+            const promptText = document.getElementById('promptInput').value.trim();
+
+            if (!promptText) {
+                alert('Kripya bolkar ya likhkar koi prompt dein!');
+                return;
+            }
+
+            if (currentMode === 'image') {
+                generateImage(promptText);
+            } else {
+                generateVideo(promptText);
+            }
+        }
+
+        function generateImage(promptText) {
+            const style = document.getElementById('styleSelect').value;
+            const ratio = document.getElementById('ratioSelect').value;
 
             const loader = document.getElementById('loader');
             const placeholder = document.getElementById('placeholder');
@@ -277,72 +420,88 @@
             let width = 768;
             let height = 768;
 
-            if (ratio === "16:9") {
-                width = 1024;
-                height = 576;
-            } else if (ratio === "9:16") {
-                width = 576;
-                height = 1024;
-            }
+            if (ratio === "16:9") { width = 1024; height = 576; }
+            else if (ratio === "9:16") { width = 576; height = 1024; }
 
             const fullPrompt = style ? `${promptText}, ${style}` : promptText;
             const cleanPrompt = encodeURIComponent(fullPrompt);
             const seed = Math.floor(Math.random() * 1000000);
 
             const primaryUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
-            const fallbackUrl = `https://pollinations.ai/p/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
 
-            loader.style.display = 'block';
-            placeholder.style.display = 'none';
-            resultImg.style.display = 'none';
-            downloadBtn.style.display = 'none';
-            generateBtn.disabled = true;
-            generateBtn.innerText = 'Generating...';
+            showLoading();
 
             let tempImg = new Image();
             tempImg.src = primaryUrl;
 
             tempImg.onload = function() {
-                displaySuccess(primaryUrl);
+                displaySuccess(primaryUrl, 'blip-ai-image.jpg');
             };
 
             tempImg.onerror = function() {
-                let fallbackImg = new Image();
-                fallbackImg.src = fallbackUrl;
+                alert('Image generate karne me dikkat aai. Kripya dobara koshish karein!');
+                resetUI();
+            };
+        }
 
-                fallbackImg.onload = function() {
-                    displaySuccess(fallbackUrl);
-                };
+        function generateVideo(promptText) {
+            const cleanPrompt = encodeURIComponent(`${promptText}, animated video, loop motion`);
+            const seed = Math.floor(Math.random() * 1000000);
 
-                fallbackImg.onerror = function() {
-                    alert('Image generate karne me दिक्कत आई। कृपया दोबारा प्रयास करें!');
-                    resetUI();
-                };
+            // Pollinations Animation Endpoint
+            const videoUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=512&height=512&seed=${seed}&model=turtle&nologo=true`;
+
+            showLoading();
+
+            let tempImg = new Image();
+            tempImg.src = videoUrl;
+
+            tempImg.onload = function() {
+                displaySuccess(videoUrl, 'blip-ai-video.gif');
             };
 
-            function displaySuccess(url) {
-                resultImg.src = url;
-                resultImg.style.display = 'block';
-                loader.style.display = 'none';
+            tempImg.onerror = function() {
+                alert('Video generate karne me dikkat aai. Kripya dobara try karein!');
+                resetUI();
+            };
+        }
 
-                downloadBtn.href = url;
-                downloadBtn.style.display = 'inline-block';
+        function showLoading() {
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('resultImage').style.display = 'none';
+            document.getElementById('downloadBtn').style.display = 'none';
+            
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.innerText = 'Generating...';
+        }
 
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Image';
-            }
+        function displaySuccess(url, fileName) {
+            const resultImg = document.getElementById('resultImage');
+            const loader = document.getElementById('loader');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const generateBtn = document.getElementById('generateBtn');
 
-            function resetUI() {
-                loader.style.display = 'none';
-                placeholder.style.display = 'block';
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Image';
-            }
+            resultImg.src = url;
+            resultImg.style.display = 'block';
+            loader.style.display = 'none';
+
+            downloadBtn.href = url;
+            downloadBtn.download = fileName;
+            downloadBtn.style.display = 'inline-block';
+
+            generateBtn.disabled = false;
+            setMode(currentMode);
+        }
+
+        function resetUI() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('placeholder').style.display = 'block';
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = false;
+            setMode(currentMode);
         }
     </script>
 </body>
 </html>
-
-
-
-                
