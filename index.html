@@ -1,81 +1,324 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Free AI Image Generator</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { background: #0f172a; color: #fff; text-align: center; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    h1 { margin-bottom: 20px; color: #38bdf8; }
-    input[type="text"] { width: 100%; padding: 12px; border-radius: 6px; border: none; margin-bottom: 15px; font-size: 16px; color: #000; }
-    button { background: #38bdf8; color: #0f172a; font-weight: bold; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; }
-    button:hover { background: #0284c7; color: #fff; }
-    .ad-box { background: #334155; height: 90px; margin: 20px 0; border: 1px dashed #94a3b8; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
-    #result-box { margin-top: 20px; display: none; }
-    #generated-img { width: 100%; border-radius: 8px; margin-bottom: 15px; }
-    .download-btn { background: #22c55e; color: #fff; text-decoration: none; display: inline-block; padding: 10px 20px; border-radius: 6px; font-weight: bold; }
-    .download-btn:hover { background: #16a34a; }
-    #loader { display: none; color: #f59e0b; font-weight: bold; margin-top: 15px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator - Create Stunning Art Free</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            margin-top: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #38bdf8;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .option-box label {
+            display: block;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #0284c7;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0369a1;
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .output-box {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background: #0f172a;
+            border: 2px dashed #334155;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .output-box img {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .placeholder-text {
+            color: #64748b;
+            text-align: center;
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #334155;
+            border-top: 4px solid #38bdf8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .download-btn {
+            display: none;
+            margin-top: 15px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .download-btn:hover {
+            background: #059669;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>AI Image Generator</h1>
-    
-    <div class="ad-box">Ad Space (Google AdSense / Adsterra)</div>
+    <div class="container">
+        <header>
+            <h1><i class="fa-solid fa-wand-magic-sparkles"></i> AI Image Generator</h1>
+            <p>Turn your imagination into stunning AI-generated visuals for free!</p>
+        </header>
 
-    <input type="text" id="prompt-input" placeholder="यहाँ प्रॉम्प्ट लिखें (उदा: Flying car in futuristic city)...">
-    <button onclick="generateImage()">Generate Image</button>
+        <div class="input-group">
+            <textarea id="promptInput" placeholder="Describe what you want to see... (e.g. A futuristic city in cyberpunk style)"></textarea>
+            
+            <div class="options-grid">
+                <div class="option-box">
+                    <label>Art Style</label>
+                    <select id="styleSelect">
+                        <option value="">Default (Natural)</option>
+                        <option value="photorealistic, 8k resolution, highly detailed">Realistic Photo</option>
+                        <option value="anime style, vibrant colors, Studio Ghibli">Anime</option>
+                        <option value="3D render, Pixar style, cute, smooth lighting">3D Render</option>
+                        <option value="cyberpunk style, neon lights, futuristic">Cyberpunk</option>
+                        <option value="cinematic lighting, epic scene, dramatic atmosphere">Cinematic</option>
+                    </select>
+                </div>
+                <div class="option-box">
+                    <label>Aspect Ratio</label>
+                    <select id="ratioSelect">
+                        <option value="1:1">Square (1:1)</option>
+                        <option value="16:9">Landscape (16:9)</option>
+                        <option value="9:16">Portrait (9:16)</option>
+                    </select>
+                </div>
+            </div>
 
-    <div id="loader">इमेज बन रही है, कृपया प्रतीक्षा करें...</div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="generateRandomPrompt()"><i class="fa-solid fa-shuffle"></i> Random</button>
+                <button class="btn btn-primary" id="generateBtn" onclick="generateImage()"><i class="fa-solid fa-bolt"></i> Generate Image</button>
+            </div>
+        </div>
 
-    <div id="result-box">
-      <img id="generated-img" src="" alt="AI Image">
-      <br>
-      <a id="download-link" class="download-btn" href="#" download="ai-image.jpg">Download Image</a>
+        <div class="output-box" id="outputBox">
+            <div class="loader" id="loader"></div>
+            <div class="placeholder-text" id="placeholder">Your generated image will appear here</div>
+            <img id="resultImage" alt="AI Generated Image">
+        </div>
+
+        <a href="#" id="downloadBtn" class="download-btn" download="ai-image.jpg" target="_blank"><i class="fa-solid fa-download"></i> Download Image</a>
     </div>
 
-    <div class="ad-box">Ad Space (Loading Ad Zone)</div>
-  </div>
+    <script>
+        const randomPrompts = [
+            "A cute baby panda wearing a space helmet, sitting on the moon, digital art",
+            "A mystical forest with glowing mushrooms and a crystal clear river at night",
+            "A futuristic flying car cruising through a neon-lit cyberpunk city",
+            "An ancient underwater temple guarded by a giant glowing creature",
+            "A majestic eagle made of fire flying over snow-covered mountains"
+        ];
 
-  <script>
-    async function generateImage() {
-      const prompt = document.getElementById('prompt-input').value.trim();
-      if (!prompt) {
-        alert("कृपया कोई प्रॉम्प्ट लिखें!");
-        return;
-      }
+        function generateRandomPrompt() {
+            const randomIndex = Math.floor(Math.random() * randomPrompts.length);
+            document.getElementById('promptInput').value = randomPrompts[randomIndex];
+        }
 
-      const loader = document.getElementById('loader');
-      const resultBox = document.getElementById('result-box');
-      const imgElement = document.getElementById('generated-img');
-      const downloadLink = document.getElementById('download-link');
+        function generateImage() {
+            const promptText = document.getElementById('promptInput').value.trim();
+            const style = document.getElementById('styleSelect').value;
+            const ratio = document.getElementById('ratioSelect').value;
 
-      loader.style.display = 'block';
-      resultBox.style.display = 'none';
+            if (!promptText) {
+                alert('कृपया कोई प्रॉम्प्ट लिखें!');
+                return;
+            }
 
-      const encodedPrompt = encodeURIComponent(prompt);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true`;
+            const loader = document.getElementById('loader');
+            const placeholder = document.getElementById('placeholder');
+            const resultImg = document.getElementById('resultImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const generateBtn = document.getElementById('generateBtn');
 
-      try {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
+            // Set aspect ratio sizes
+            let width = 1024;
+            let height = 1024;
 
-        imgElement.src = objectUrl;
-        downloadLink.href = objectUrl;
+            if (ratio === "16:9") {
+                width = 1280;
+                height = 720;
+            } else if (ratio === "9:16") {
+                width = 720;
+                height = 1280;
+            }
 
-        loader.style.display = 'none';
-        resultBox.style.display = 'block';
-      } catch (error) {
-        loader.style.display = 'none';
-        alert("इमेज जनरेट करने में समस्या आई, फिर से प्रयास करें।");
-      }
-    }
-  </script>
+            const fullPrompt = style ? `${promptText}, ${style}` : promptText;
+            const seed = Math.floor(Math.random() * 1000000);
+            const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(fullPrompt)}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
 
+            // UI Adjustments for Loading State
+            loader.style.display = 'block';
+            placeholder.style.display = 'none';
+            resultImg.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            generateBtn.disabled = true;
+            generateBtn.innerText = 'Generating...';
+
+            // Preload Image
+            const tempImg = new Image();
+            tempImg.src = imageUrl;
+
+            tempImg.onload = function() {
+                resultImg.src = imageUrl;
+                resultImg.style.display = 'block';
+                loader.style.display = 'none';
+
+                downloadBtn.href = imageUrl;
+                downloadBtn.style.display = 'inline-block';
+
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Image';
+            };
+
+            tempImg.onerror = function() {
+                alert('इमेज जनरेट करने में कोई समस्या आई। कृपया पुनः प्रयास करें।');
+                loader.style.display = 'none';
+                placeholder.style.display = 'block';
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Image';
+            };
+        }
+    </script>
 </body>
 </html>
