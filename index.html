@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator - Create Stunning Art Free</title>
+    <title>AI Image Generator - Create Free Visuals</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -28,44 +27,44 @@
             max-width: 900px;
             width: 100%;
             background: #1e293b;
-            padding: 30px;
+            padding: 25px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         header h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: #38bdf8;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         header p {
             color: #94a3b8;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         textarea {
             width: 100%;
-            height: 100px;
+            height: 90px;
             background: #0f172a;
             border: 1px solid #334155;
             border-radius: 10px;
             padding: 12px;
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.95rem;
             resize: none;
             outline: none;
         }
@@ -76,15 +75,15 @@
 
         .options-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
         }
 
         .option-box label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #94a3b8;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         select {
@@ -101,7 +100,7 @@
         .actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .btn {
@@ -129,7 +128,7 @@
 
         .btn-secondary {
             background: #334155;
-            color: #white;
+            color: #fff;
         }
 
         .btn-secondary:hover {
@@ -137,22 +136,23 @@
         }
 
         .output-box {
-            margin-top: 25px;
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 300px;
+            min-height: 280px;
             background: #0f172a;
             border: 2px dashed #334155;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
+            padding: 10px;
         }
 
         .output-box img {
             max-width: 100%;
-            max-height: 500px;
+            max-height: 450px;
             border-radius: 8px;
             display: none;
         }
@@ -160,6 +160,7 @@
         .placeholder-text {
             color: #64748b;
             text-align: center;
+            font-size: 0.9rem;
         }
 
         .loader {
@@ -186,6 +187,7 @@
             padding: 10px 20px;
             border-radius: 8px;
             font-weight: 600;
+            text-align: center;
         }
 
         .download-btn:hover {
@@ -202,7 +204,7 @@
         </header>
 
         <div class="input-group">
-            <textarea id="promptInput" placeholder="Describe what you want to see... (e.g. A futuristic city in cyberpunk style)"></textarea>
+            <textarea id="promptInput" placeholder="Describe what you want to see... (e.g. A cute cat in superhero costume)"></textarea>
             
             <div class="options-grid">
                 <div class="option-box">
@@ -210,10 +212,10 @@
                     <select id="styleSelect">
                         <option value="">Default (Natural)</option>
                         <option value="photorealistic, 8k resolution, highly detailed">Realistic Photo</option>
-                        <option value="anime style, vibrant colors, Studio Ghibli">Anime</option>
-                        <option value="3D render, Pixar style, cute, smooth lighting">3D Render</option>
-                        <option value="cyberpunk style, neon lights, futuristic">Cyberpunk</option>
-                        <option value="cinematic lighting, epic scene, dramatic atmosphere">Cinematic</option>
+                        <option value="anime style, vibrant colors">Anime</option>
+                        <option value="3D render, Pixar style, smooth lighting">3D Render</option>
+                        <option value="cyberpunk style, neon lights">Cyberpunk</option>
+                        <option value="cinematic lighting, epic scene">Cinematic</option>
                     </select>
                 </div>
                 <div class="option-box">
@@ -261,7 +263,7 @@
             const ratio = document.getElementById('ratioSelect').value;
 
             if (!promptText) {
-                alert('कृपया कोई प्रॉम्प्ट लिखें!');
+                alert('Kripya koi prompt likhein!');
                 return;
             }
 
@@ -271,23 +273,25 @@
             const downloadBtn = document.getElementById('downloadBtn');
             const generateBtn = document.getElementById('generateBtn');
 
-            // Set aspect ratio sizes
-            let width = 1024;
-            let height = 1024;
+            let width = 768;
+            let height = 768;
 
             if (ratio === "16:9") {
-                width = 1280;
-                height = 720;
+                width = 1024;
+                height = 576;
             } else if (ratio === "9:16") {
-                width = 720;
-                height = 1280;
+                width = 576;
+                height = 1024;
             }
 
             const fullPrompt = style ? `${promptText}, ${style}` : promptText;
+            const cleanPrompt = encodeURIComponent(fullPrompt);
             const seed = Math.floor(Math.random() * 1000000);
-            const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(fullPrompt)}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
 
-            // UI Adjustments for Loading State
+            // Primary URL & Fallback URLs
+            const primaryUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
+            const fallbackUrl = `https://pollinations.ai/p/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
+
             loader.style.display = 'block';
             placeholder.style.display = 'none';
             resultImg.style.display = 'none';
@@ -295,29 +299,46 @@
             generateBtn.disabled = true;
             generateBtn.innerText = 'Generating...';
 
-            // Preload Image
-            const tempImg = new Image();
-            tempImg.src = imageUrl;
+            let tempImg = new Image();
+            tempImg.src = primaryUrl;
 
             tempImg.onload = function() {
-                resultImg.src = imageUrl;
+                displaySuccess(primaryUrl);
+            };
+
+            tempImg.onerror = function() {
+                // Try fallback URL if primary fails
+                let fallbackImg = new Image();
+                fallbackImg.src = fallbackUrl;
+
+                fallbackImg.onload = function() {
+                    displaySuccess(fallbackUrl);
+                };
+
+                fallbackImg.onerror = function() {
+                    alert('Image generate karne me dikkat aai. Kripya fir se Generate button dabayein!');
+                    resetUI();
+                };
+            };
+
+            function displaySuccess(url) {
+                resultImg.src = url;
                 resultImg.style.display = 'block';
                 loader.style.display = 'none';
 
-                downloadBtn.href = imageUrl;
+                downloadBtn.href = url;
                 downloadBtn.style.display = 'inline-block';
 
                 generateBtn.disabled = false;
                 generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Image';
-            };
+            }
 
-            tempImg.onerror = function() {
-                alert('इमेज जनरेट करने में कोई समस्या आई। कृपया पुनः प्रयास करें।');
+            function resetUI() {
                 loader.style.display = 'none';
                 placeholder.style.display = 'block';
                 generateBtn.disabled = false;
                 generateBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Generate Image';
-            };
+            }
         }
     </script>
 </body>
